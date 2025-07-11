@@ -1,4 +1,4 @@
-name: Build Pineapple APK
+name: Build Signed Pineapple APK
 
 on:
   push:
@@ -46,11 +46,22 @@ jobs:
     - name: Clean project
       run: ./gradlew clean
     
-    - name: Build Debug APK
+    - name: Build Debug APK (Auto-signed)
       run: ./gradlew assembleDebug
     
-    - name: Build Release APK
+    - name: Build Release APK (Unsigned)
       run: ./gradlew assembleRelease
+    
+    - name: Sign Release APK with Debug Key
+      run: |
+        # Use Android SDK's debug keystore to sign the release APK
+        $ANDROID_HOME/build-tools/34.0.0/apksigner sign \
+          --ks ~/.android/debug.keystore \
+          --ks-key-alias androiddebugkey \
+          --ks-pass pass:android \
+          --key-pass pass:android \
+          --out app/build/outputs/apk/release/pineapple-release-signed.apk \
+          app/build/outputs/apk/release/*.apk
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -58,22 +69,20 @@ jobs:
         name: pineapple-debug-apk
         path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
+        if-no-files-found: warn
     
-    - name: Upload Release APK
+    - name: Upload Signed Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: pineapple-release-apk
+        name: pineapple-release-signed-apk
+        path: app/build/outputs/apk/release/pineapple-release-signed.apk
+        retention-days: 30
+        if-no-files-found: warn
+    
+    - name: Upload Unsigned Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: pineapple-release-unsigned-apk
         path: app/build/outputs/apk/release/*.apk
         retention-days: 30
-    
-    - name: Create GitHub Release (on tags)
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          app/build/outputs/apk/debug/*.apk
-          app/build/outputs/apk/release/*.apk
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if-no-files-found: warn
