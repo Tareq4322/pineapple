@@ -1,12 +1,10 @@
 name: Build Pineapple APK
-
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,9 +32,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     
-    - name: Create gradle.properties with Reddit Client Secret
+    - name: Create gradle.properties with Reddit Credentials
       run: |
         echo "ClientSecret=\"${{ secrets.REDDIT_CLIENT_SECRET }}\"" >> gradle.properties
+        echo "ClientId=\"${{ secrets.REDDIT_CLIENT_ID }}\"" >> gradle.properties
         echo "android.useAndroidX=true" >> gradle.properties
         echo "android.enableJetifier=true" >> gradle.properties
     
