@@ -6,6 +6,7 @@ plugins {
 android {
     namespace 'com.pineapple.app'
     compileSdk 34
+
     defaultConfig {
         applicationId "com.pineapple.app"
         minSdk 24
@@ -13,29 +14,40 @@ android {
         versionCode 1
         versionName "v1.0-beta"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        // ✅ Inject Reddit credentials from gradle.properties
+        buildConfigField "String", "REDDIT_CLIENT_ID", "\"${project.findProperty("ClientId") ?: ""}\""
+        buildConfigField "String", "REDDIT_CLIENT_SECRET", "\"${project.findProperty("ClientSecret") ?: ""}\""
+
         vectorDrawables {
             useSupportLibrary true
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
     buildFeatures {
         compose true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.4'
     }
+
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -44,7 +56,6 @@ android {
 }
 
 dependencies {
-
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -62,7 +73,6 @@ dependencies {
     implementation "androidx.paging:paging-runtime:$paging_version"
     implementation "androidx.paging:paging-compose:3.3.0-alpha02"
     implementation "androidx.core:core-splashscreen:1.0.1"
-
 
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
     implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
@@ -86,5 +96,4 @@ dependencies {
     implementation 'com.github.ireward:compose-html:1.0.2'
     implementation "com.atlassian.commonmark:commonmark:0.15.2"
     implementation "org.ocpsoft.prettytime:prettytime:4.0.4.Final"
-
 }
